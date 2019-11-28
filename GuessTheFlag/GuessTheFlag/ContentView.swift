@@ -9,8 +9,14 @@
 import SwiftUI
 
 struct ContentView: View {
+    private let gradient = Gradient(colors: [.red, .yellow, .green, .blue, .purple, .red])
+    private var rainbow: AngularGradient { AngularGradient(gradient: gradient, center: .center) }
+
     var body: some View {
-        Text("Hello, World!")
+        ZStack {
+            self.rainbow.frame(width: 400, height: 400).cornerRadius(200)
+            Text("Hello World")
+        }
     }
 }
 
