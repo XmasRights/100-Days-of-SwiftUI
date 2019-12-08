@@ -8,15 +8,29 @@
 
 import SwiftUI
 
-struct Conversion {
-    let units: [String]
+protocol Unit {
+    var description: String { get }
 }
 
-extension Conversion {
-    static var temperature: Conversion {
-        return .init(
-            units: ["˚C", "˚F", "K"]
-        )
+extension String: Unit {}
+
+struct Value {
+    let amount: Double
+    let unit: Unit
+
+    var description: String {
+        let formatted = String(format: "%.2f", amount)
+        return "\(formatted)\(unit)"
+    }
+}
+
+protocol Conversion {
+    var units: [Unit] { get }
+}
+
+struct Temperature: Conversion {
+    var units: [Unit] {
+        ["˚C", "˚F", "K"]
     }
 }
 
@@ -24,7 +38,9 @@ struct ContentView: View {
     @State private var amount = ""
     @State private var unitSelection = 0
 
-    private let current = Conversion.temperature
+    private var current: some Conversion {
+        Temperature()
+    }
 
     var body: some View {
         NavigationView {
@@ -33,7 +49,7 @@ struct ContentView: View {
                     TextField("Amount", text: $amount)
                     Picker("Units", selection: $unitSelection) {
                         ForEach(0..<current.units.count) {
-                            Text("\(self.current.units[$0])")
+                            Text("\(self.current.units[$0].description)")
                         }
                     }.pickerStyle(SegmentedPickerStyle())
                 }
