@@ -14,7 +14,7 @@ protocol Unit {
 
 extension String: Unit {}
 
-struct Value<UnitType> {
+struct Value<UnitType: Unit> {
     let amount: Double
     let unit: UnitType
 
@@ -116,12 +116,27 @@ private extension Temperature.Units {
     }
 }
 
+struct AnyValue {
+    var description: String
+
+    init<U: Unit>(_ value: Value<U>) {
+        self.description = value.description
+    }
+}
+
 struct ContentView: View {
     @State private var amount = ""
     @State private var unitSelection = 0
 
     private var current: some Conversion {
         Temperature()
+    }
+
+    private var conversions: [AnyValue] {
+        let amount = Double(self.amount) ?? 0.0
+        let unit = current.units[unitSelection]
+        let value = Value(amount: amount, unit: unit)
+        return current.allConversions(for: value).map(AnyValue.init)
     }
 
     var body: some View {
