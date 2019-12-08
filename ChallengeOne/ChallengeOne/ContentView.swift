@@ -14,9 +14,9 @@ protocol Unit {
 
 extension String: Unit {}
 
-struct Value {
+struct Value<UnitType> {
     let amount: Double
-    let unit: Unit
+    let unit: UnitType
 
     var description: String {
         let formatted = String(format: "%.2f", amount)
@@ -25,12 +25,37 @@ struct Value {
 }
 
 protocol Conversion {
-    var units: [Unit] { get }
+    associatedtype UnitType: Unit
+
+    var units: [UnitType] { get }
+    func convert(value: Value<UnitType>, into: UnitType) -> Value<UnitType>
+}
+
+extension Conversion {
+    func allConversions(for value: Value<UnitType>) -> [Value<UnitType>] {
+        let units = self.units.filter {
+            $0.description != value.unit.description
+        }
+        return units.map { convert(value: value, into: $0) }
+    }
 }
 
 struct Temperature: Conversion {
-    var units: [Unit] {
-        ["˚C", "˚F", "K"]
+    enum Units: String, Unit, CaseIterable {
+        case celcius   = "˚C"
+        case farenheit = "˚F"
+        case kelvin    = "K"
+
+        var description: String { self.rawValue }
+    }
+
+    var units: [Units] {
+        Units.allCases
+    }
+
+    func convert(value: Value<Units>, into: Units) -> Value<Units> {
+        // TODO
+        .init(amount: 100, unit: .celcius)
     }
 }
 
