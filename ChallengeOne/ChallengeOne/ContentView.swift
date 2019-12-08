@@ -47,15 +47,72 @@ struct Temperature: Conversion {
         case kelvin    = "K"
 
         var description: String { self.rawValue }
+
+        var converter: (Double, Self) -> Value<Self> {
+            switch self {
+            case .celcius:   return { self.convert(celcius: $0, as: $1)   }
+            case .farenheit: return { self.convert(farenheit: $0, as: $1) }
+            case .kelvin:    return { self.convert(kelvin: $0, as: $1)    }
+            }
+        }
     }
 
     var units: [Units] {
         Units.allCases
     }
 
-    func convert(value: Value<Units>, into: Units) -> Value<Units> {
-        // TODO
-        .init(amount: 100, unit: .celcius)
+    func convert(value: Value<Units>, into unit: Units) -> Value<Units> {
+        let converter = value.unit.converter
+        return converter(value.amount, unit)
+    }
+}
+
+// MARK: Conversion Helpers
+
+private extension Temperature.Units {
+    func convert(celcius: Double, as unit: Self) -> Value<Self> {
+        switch unit {
+        case .celcius:
+            return .init(amount: celcius, unit: .celcius)
+
+        case .farenheit:
+            let f = celcius * 1.8 + 32.0
+            return .init(amount: f, unit: .farenheit)
+
+        case .kelvin:
+            let k = celcius + 273.15
+            return .init(amount: k, unit: .kelvin)
+        }
+    }
+
+    func convert(farenheit: Double, as unit: Self) -> Value<Self> {
+        switch unit {
+        case .celcius:
+            let c = (farenheit - 32) / 1.8
+            return .init(amount: c, unit: .celcius)
+
+        case .farenheit:
+            return .init(amount: farenheit, unit: .farenheit)
+
+        case .kelvin:
+            let k = (farenheit - 32) / 1.8 + 273.15
+            return .init(amount: k, unit: .kelvin)
+        }
+    }
+
+    func convert(kelvin: Double, as unit: Self) -> Value<Self> {
+        switch unit {
+        case .celcius:
+            let c = kelvin - 273.15
+            return .init(amount: c, unit: .celcius)
+
+        case .farenheit:
+            let f = (kelvin - 273.15) * 1.8 + 32.0
+            return .init(amount: f, unit: .farenheit)
+
+        case .kelvin:
+            return .init(amount: kelvin, unit: .kelvin)
+        }
     }
 }
 
