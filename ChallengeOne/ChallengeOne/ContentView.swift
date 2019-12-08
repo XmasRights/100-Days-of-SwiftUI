@@ -8,9 +8,38 @@
 
 import SwiftUI
 
+struct Conversion {
+    let units: [String]
+}
+
+extension Conversion {
+    static var temperature: Conversion {
+        return .init(
+            units: ["˚C", "˚F", "K"]
+        )
+    }
+}
+
 struct ContentView: View {
+    @State private var amount = ""
+    @State private var unitSelection = 0
+
+    private let current = Conversion.temperature
+
     var body: some View {
-        Text("Hello, World!")
+        NavigationView {
+            Form {
+                Section {
+                    TextField("Amount", text: $amount)
+                    Picker("Units", selection: $unitSelection) {
+                        ForEach(0..<current.units.count) {
+                            Text("\(self.current.units[$0])")
+                        }
+                    }.pickerStyle(SegmentedPickerStyle())
+                }
+            }
+            .navigationBarTitle("CNVRTR!")
+        }
     }
 }
 
