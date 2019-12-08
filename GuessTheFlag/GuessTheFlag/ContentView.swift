@@ -9,13 +9,33 @@
 import SwiftUI
 
 struct ContentView: View {
-    private let gradient = Gradient(colors: [.red, .yellow, .green, .blue, .purple, .red])
-    private var rainbow: AngularGradient { AngularGradient(gradient: gradient, center: .center) }
+    var countries = ["estonia", "france", "germany", "ireland", "italy", "nigeria", "poland", "russia", "spain", "uk", "us"].shuffled()
+
+    var correctAnswer = Int.random(in: 0...2)
 
     var body: some View {
         ZStack {
-            self.rainbow.frame(width: 400, height: 400).cornerRadius(200)
-            Text("Hello World")
+            Color.blue.edgesIgnoringSafeArea(.all)
+
+            VStack(spacing: 30) {
+                VStack {
+                    Text("Tap the flag of")
+                        .foregroundColor(.white)
+                    Text(countries[correctAnswer].capitalized)
+                    .foregroundColor(.white)
+                }
+
+                ForEach(0..<3) { number in
+                    Button(action: {
+                        // Flag was tapped
+                    }) {
+                        Image(self.countries[number])
+                            .renderingMode(.original)
+                    }
+                }
+
+                Spacer()
+            }
         }
     }
 }
