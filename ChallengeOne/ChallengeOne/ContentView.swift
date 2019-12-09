@@ -41,12 +41,18 @@ extension Conversion {
 }
 
 struct Temperature: Conversion {
-    enum Units: String, Unit, CaseIterable {
-        case celcius   = "˚C"
-        case farenheit = "˚F"
-        case kelvin    = "K"
+    enum Units: Unit, CaseIterable {
+        case celcius
+        case farenheit
+        case kelvin
 
-        var description: String { self.rawValue }
+        var description: String {
+            switch self {
+            case .celcius:   return "˚C"
+            case .farenheit: return "˚F"
+            case .kelvin:    return "K"
+            }
+        }
 
         var converter: (Double, Self) -> Value<Self> {
             switch self {
@@ -149,6 +155,12 @@ struct ContentView: View {
                             Text("\(self.current.units[$0].description)")
                         }
                     }.pickerStyle(SegmentedPickerStyle())
+                }
+
+                Section {
+                    ForEach(0..<conversions.count) {
+                        Text("\(self.conversions[$0].description)")
+                    }
                 }
             }
             .navigationBarTitle("CNVRTR!")
